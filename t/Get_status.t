@@ -44,9 +44,38 @@ sub shutdown  : Test(shutdown) {
 #-------------------------------[ UNIT TESTS HERE ]-----------------------------
 
 sub AA_test_main : Test(no_plan) {
-  #main->set_rhConfig({work_file => 't/cpkoel_prod_mock.log'});
-  @ARGV = qw(-f t/cpkoel_prod_mock.log);
-  main->start;
+  use Prod;
+  @ARGV = qw(                 
+    -b Schlog      
+    -f t/cpkoel_prod_mock.log 
+    -h Goofy
+  );
+
+  my $tag = 'Get_status';
+  my $rh_config = {
+    work_file => './bolt.log', # default
+  };
+
+  my $get_opt_parms = {
+    'w|f|work_file=s'	=> \$rh_config->{work_file},  
+    'b|disney_beast=s'	=> \$rh_config->{disney_beast},  
+    'h|disney_hero=s'	  => \$rh_config->{disney_hero},  
+  };   
+
+  my $usage_msg =<< 'EOF';
+  BOGUS_MSG
+EOF
+  
+my %data =(
+  rh_config     => $rh_config,
+  getopt_parms  => $get_opt_parms,
+  usage_msg     => $usage_msg,
+  my_test       => 1234,
+);
+
+my $main = Prod->new(%data);
+$main->start($tag);
+
 }
 
 sub test_Get_status : Test(no_plan) {

@@ -8,7 +8,7 @@ my $cols=5;
 
 #--system parms
 my $col_width = int($width  / $cols);
-our $status={};
+my $status;
 
 sub work_file {shift->{work_file}}
 sub new { 
@@ -61,7 +61,6 @@ sub is_Finished {
 sub get_still_active  {shift;_get_status('started')}
 sub get_finished      {shift;_get_status('finished')}
 sub get_failed        {shift;_get_status('failed')}
-
 sub _get_status {
   my ($tag) = @_;
   my @list; 
@@ -151,11 +150,9 @@ sub get_total_server_count {
 # get_bolt_job_start_time
 sub get_bolt_job_start_time {
 	my ($self,) = @_;
-  $DB::single = 1; 
   my @stdout = qx(ps faux | grep bin/bolt | grep -v grep);
   return 'FINISHED' unless @stdout;
   return join(' ', (split(/\s+/,$stdout[0]))[8,9]);
-  # root     29854  0.0  0.0 107956   356 pts/0    S    16:36   0:00          \_ sleep 30
 }
 
 sub main     { 
@@ -170,57 +167,6 @@ sub teardown  {
 }
 
 }#-- Get_status
-
-
-{
-package main; 
-use Carp::Always;
-use Getopt::Long ();
-use Modern::Perl;
-
-my $rhConfig = {
-  debug => 0,
-  work_file => './bolt.log',
-};
-
-my %hParms = ( 
-  'w|f|work_file=s'	=> \$rhConfig->{work_file},  
-);   
-
-sub ShowError {
-  print "$_[0]\n" if @_;   
-  print <<'EOF';
-
---------------------------------------------
-get_status.pl -[w|f|work_file FILENAME] 
---------------------------------------------
-
-reads bolt log file and gives server status of job 
-
-FILENAME defaults to ./bolt.log
-
-EOF
-  exit $?;
-}
-
-sub set_rhConfig {shift; $rhConfig = shift}
-
-sub start {
-eval {
-  Getopt::Long::GetOptions (%hParms) or die ("FAIL: CLI errors");
-  my $self = Get_status->new(
-    %$rhConfig,
-  );
-
-  $self->setup();
-  $self->main ();
-  $self->teardown();
-};
-
-ShowError($@) if $@;
-}
-
-}#-- main
 
 1;
 
