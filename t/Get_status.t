@@ -41,9 +41,6 @@ sub shutdown  : Test(shutdown) {
   my $self = shift;
 }
 
-git config --global user.name "Jan Samborski"
-git config --global user.email janman27929@gmail.com
-
 #-------------------------------[ UNIT TESTS HERE ]-----------------------------
 
 sub AA_test_main : Test(no_plan) {
